@@ -19,7 +19,6 @@ type addMethodParams struct {
 	V2 int64 `json:"value2"`
 }
 
-//func (m *addMethod) Execute(ctx context.Context, req *jrpc.Request, resp *jrpc.Response) {
 func (m *addMethod) Execute(req *jrpc.Request, resp *jrpc.Response) {
 	var p addMethodParams
 

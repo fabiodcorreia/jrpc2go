@@ -64,9 +64,21 @@ type Manager struct {
 //
 // It can return an error if the JSON encoding or the writing fails.
 func (m *Manager) Handle(ctx context.Context, r io.Reader, w io.Writer) error {
+	if r == nil {
+		return newError(errCodeInternal, "r io.Reader can't be nil")
+	}
+
+	if w == nil {
+		return newError(errCodeInternal, "w io.Writer can't be nil")
+	}
+
 	rq, err := parseMethodRequest(r)
 	if err != nil {
 		return err
+	}
+
+	if ctx == nil {
+		ctx = context.Background()
 	}
 
 	if len(rq) == 0 {
@@ -78,16 +90,18 @@ func (m *Manager) Handle(ctx context.Context, r io.Reader, w io.Writer) error {
 	for i := range rq {
 		tResp := m.execMethod(ctx, rq[i])
 		// If no ID means it's a notification and the server shouldn't reply
-		if rq[i].ID != nil {
+		// if we have an error it should return anyway
+		if rq[i].ID != nil || tResp.Error != nil {
 			resp = append(resp, tResp)
 		}
 	}
 
 	// If more then one response return a json array
 	if len(resp) > 1 {
-		if err := json.NewEncoder(w).Encode(resp); err != nil {
-			return err
-		}
+		return json.NewEncoder(w).Encode(resp)
+		//if err := json.NewEncoder(w).Encode(resp); err != nil {
+		//	return err
+		//}
 	}
 	// If only one response return a json object
 	if len(resp) == 1 {
@@ -100,7 +114,7 @@ func (m *Manager) Handle(ctx context.Context, r io.Reader, w io.Writer) error {
 // execMethod will receive a request, execute the method and return the response.
 func (m *Manager) execMethod(ctx context.Context, req *Request) *Response {
 	res := newResponse(req)
-	if res.Version != version {
+	if req.Version != version {
 		res.Error = newError(errCodeInvalidRPCVersion, res.Version)
 		return res
 	}

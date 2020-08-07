@@ -35,7 +35,7 @@ const errCodeMethodNotFound ErrorCode = -32601
 const errCodeInvalidParams ErrorCode = -32602
 
 // ErrCodeInternal means internal JSON-RPC error.
-const ErrCodeInternal ErrorCode = -32603
+const errCodeInternal ErrorCode = -32603
 
 // ErrCodeInvalidRPCVersion means the requested JSON RPC version is not correct or invalid.
 const errCodeInvalidRPCVersion ErrorCode = -32001
@@ -58,7 +58,7 @@ func newError(code ErrorCode, data interface{}) *Error {
 		e.Message = "Method not found"
 	case errCodeInvalidParams:
 		e.Message = "Invalid method parameter(s)"
-	case ErrCodeInternal:
+	case errCodeInternal:
 		e.Message = "Internal error"
 	case errCodeInvalidRPCVersion:
 		e.Message = "JSON RPC Version must be 2.0"
@@ -66,12 +66,4 @@ func newError(code ErrorCode, data interface{}) *Error {
 		e.Message = "Method execution timeout"
 	}
 	return e
-}
-
-// NewError will create a new Error with a custom message
-func NewError(code ErrorCode, message string) *Error {
-	return &Error{
-		Code:    code,
-		Message: message,
-	}
 }

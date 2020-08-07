@@ -20,6 +20,7 @@ func HTTPHandleFunc(m *Manager) func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
+
 		w.Header().Add(contentTypeKey, contentTypeValue)
 
 		err := m.Handle(r.Context(), r.Body, w)

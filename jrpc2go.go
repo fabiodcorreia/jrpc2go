@@ -115,10 +115,6 @@ type Method interface {
 func parseMethodRequest(r io.Reader) ([]*Request, *Error) {
 	br := bufio.NewReader(r)
 
-	if br.Size() == 0 {
-		return nil, newError(errCodeParseError, "fail to read the request text: empty")
-	}
-
 	f, _, err := br.ReadRune()
 	if err != nil {
 		return nil, newError(errCodeParseError, fmt.Sprintf("fail to read the request text: %v", err))
